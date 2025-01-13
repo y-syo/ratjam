@@ -1,0 +1,36 @@
+body {
+	background: rgb(40,39,60);
+	background: linear-gradient(52deg, rgba(40,39,60,1) 0%, rgba(59,59,75,1) 100%);
+	background-attachment: fixed;
+	color: white;
+}
+
+audio {
+    width: 500px;
+    height: 50px;
+}
+
+.cover-list {
+	list-style-type: none;
+    display: flex;
+	align-items: center;
+    gap: 1em;
+}
+
+.cover {
+	height: 15em;
+	width: 15em;
+	border-radius: 0.5em;
+}
+
+.inactive img{
+	height: 15em;
+	width: 15em;
+	opacity: 75%;
+}
+
+.active img{
+	height: 16em;
+	width: 16em;
+	opacity: 100%;
+}

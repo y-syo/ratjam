@@ -3,70 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/style.css">
     <title>ratjam</title>
-    <style>
-.active {
-  color: blue;
-}
-</style>
 </head>
 <body>
     <h1>evilge</h1>
-    <audio id="audioPlayer" controls autoplay>
-        Your browser does not support the audio element.
-    </audio>
-	<ul id="queue"></ul>
-	<script>
-		const audioPlayer = document.getElementById("audioPlayer");
-		const queue = document.getElementById("queue");
+	<span class="title" id="title"></span><br>
+    <audio id="audioPlayer" controls> Your browser does not support the audio element. </audio>
+	<ul class="cover-list" id="queue"></ul>
 
-		let songs = [];
-		let currentIndex = 0;
-
-		async function fetchSongs() {
-			const response = await fetch('http://localhost:3000/songs');
-			songs = await response.json();
-			populateQueue();
-			loadSong(0);
-		}
-
-		function populateQueue() {
-			queue.innerHTML = '';
-			songs.forEach((song, index) => {
-				const li = document.createElement('li');
-				li.textContent = song;
-				li.dataset.index = index;
-				li.addEventListener('click', () => loadSong(index));
-				queue.appendChild(li);
-			});
-			updatePlaylistUI();
-		}
-
-		function loadSong(index) {
-			if (index >= 0 && index < songs.length)
-			{
-				currentIndex = index;
-				audioPlayer.src = `http://localhost:3000/stream/${encodeURIComponent(songs[index])}`;
-				audioPlayer.play();
-				updatePlaylistUI();
-			}
-		}
-
-		function updatePlaylistUI() {
-			const items = queue.querySelectorAll('li');
-			items.forEach(item => item.classList.remove('active'));
-			if (items[currentIndex])
-			{
-				items[currentIndex].classList.add('active');
-			}
-		}
-
-		audioPlayer.addEventListener('ended', () => {
-			currentIndex = (currentIndex + 1) % songs.length;
-			loadSong(currentIndex);
-		});
-
-		fetchSongs();
-	</script>
+	<script src="js/script.js"></script>
 </body>
 </html>

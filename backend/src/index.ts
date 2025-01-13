@@ -2,6 +2,10 @@ import express, { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 
+function getRandomInt(max) {
+	return Math.floor(Math.random() * max) % max;
+}
+
 const app = express();
 
 const audioFolder = path.join(__dirname, '../data');
@@ -9,18 +13,29 @@ const audioFolder = path.join(__dirname, '../data');
 app.get('/songs', (req: Request, res: Response) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Header' , 'authorization');
-	const songs = fs.readdirSync(audioFolder).filter(file => {
+	/*const songs = fs.readdirSync(audioFolder).filter(file => {
 		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
-	});
-	res.json(songs);
+	});*/
+	const albums = fs.readdirSync(audioFolder);
+	res.json(albums);
 });
 
 app.get('/stream/:song', (req: Request, res: Response) => {
-	const song = req.params.song;
-	const filePath = path.join(audioFolder, song);
+	//const song = req.params.song;
+	//const filePath = path.join(audioFolder, song);
+	const album = req.params.song;
+	const songs = fs.readdirSync(path.join(audioFolder, album)).filter(file => {
+		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
+	});
+	const rand = getRandomInt(songs.length);
+	console.log(rand);
+	const song = songs[rand];
+	const filePath = path.join(audioFolder, album, song);
 
 	if (!fs.existsSync(filePath))
 	{
+		console.log(filePath);
+		console.log('no audio files found');
 		return res.status(404).send('no audio files found');
 	}
 
