@@ -1,4 +1,5 @@
 const audioPlayer = document.getElementById("audioPlayer");
+const skipButton = document.getElementById("skip");
 const queue = document.getElementById("queue");
 
 let songs = [];
@@ -53,6 +54,10 @@ function updatePlaylistUI() {
 }
 
 audioPlayer.addEventListener('ended', () => {
+	loadSong(currentIndex);
+});
+
+skipButton.addEventListener('click', () => {
 	loadSong(currentIndex);
 });
 

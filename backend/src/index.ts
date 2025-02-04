@@ -22,7 +22,7 @@ app.get('/songs', (req: Request, res: Response) => {
 	/*const songs = fs.readdirSync(audioFolder).filter(file => {
 		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
 	});*/
-	//const albums = fs.readdirSync(audioFolder);
+	//const albums = fs.readdirSync(audioFolder).sort();
 	const albums = db.query("SELECT * FROM playlists").all()
 	res.json(albums);
 });
@@ -33,7 +33,7 @@ app.get('/stream/:song', (req: Request, res: Response) => {
 	let albumId = req.params.song;
 	const result = db.query("SELECT list FROM playlists WHERE id = ?1").all(albumId);
 	const songs = result[0].list.split(';');
-	/*const songs = fs.readdirSync(path.join(audioFolder, album)).filter(file => {
+	/*const songs = fs.readdirSync(path.join(audioFolder, album)).sort().filter(file => {
 		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
 	});*/
 	const rand = getRandomInt(songs.length);
