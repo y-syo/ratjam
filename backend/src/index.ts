@@ -1,10 +1,16 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
 import fs from 'fs';
+import { Database } from "bun:sqlite";
 
 function getRandomInt(max) {
 	return Math.floor(Math.random() * max) % max;
 }
+
+const db = new Database("data.db");
+
+//db.run("CREATE TABLE IF NOT EXISTS paylists (id INTEGER PRIMARY KEY, name TEXT NOT NULL, path TEXT NOT NULL, list TEXT NOT NULL);");
+//db.run("INSERT INTO playlists (name, path, list) VALUES ('Sonic', '/assets/covers/sonic_robo_blast2.jpg', '1,3');");
 
 const app = express();
 
@@ -16,21 +22,24 @@ app.get('/songs', (req: Request, res: Response) => {
 	/*const songs = fs.readdirSync(audioFolder).filter(file => {
 		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
 	});*/
-	const albums = fs.readdirSync(audioFolder);
+	//const albums = fs.readdirSync(audioFolder);
+	const albums = db.query("SELECT * FROM playlists").all()
 	res.json(albums);
 });
 
 app.get('/stream/:song', (req: Request, res: Response) => {
 	//const song = req.params.song;
 	//const filePath = path.join(audioFolder, song);
-	const album = req.params.song;
-	const songs = fs.readdirSync(path.join(audioFolder, album)).filter(file => {
+	let albumId = req.params.song;
+	const result = db.query("SELECT list FROM playlists WHERE id = ?1").all(albumId);
+	const songs = result[0].list.split(';');
+	/*const songs = fs.readdirSync(path.join(audioFolder, album)).filter(file => {
 		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
-	});
+	});*/
 	const rand = getRandomInt(songs.length);
 	console.log(rand);
 	const song = songs[rand];
-	const filePath = path.join(audioFolder, album, song);
+	const filePath = path.join(audioFolder, song);
 
 	if (!fs.existsSync(filePath))
 	{

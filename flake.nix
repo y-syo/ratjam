@@ -12,7 +12,7 @@
   in
   {
     devShells.default = pkgs.mkShell {
-	  packages = with pkgs; [ bun ];
+	  packages = with pkgs; [ bun gcc sqlite python3 ];
 	  buildInputs = with pkgs; [];
 	  shellHook = ''
 		echo -e "\x1B[0;33mentering ratjam environment...\x1B[0m"
