@@ -16,6 +16,9 @@ const app = express();
 
 const audioFolder = path.join(__dirname, '../data');
 
+var dict = {};
+
+
 app.get('/songs', (req: Request, res: Response) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Header' , 'authorization');
@@ -66,7 +69,7 @@ app.get('/stream/:song', (req: Request, res: Response) => {
 			break;
 		default:
 			console.log('error: invalid file type');
-			return ;
+			return res.status(500).send('invalid file type');
 	}
 
 	res.setHeader('Content-Type', mimeType);
