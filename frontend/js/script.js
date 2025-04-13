@@ -5,6 +5,19 @@ const queue = document.getElementById("queue");
 let songs = [];
 let currentIndex = 0;
 
+let id;
+if (document.cookie.split('=')[1] == "")
+{
+	id = Math.floor(Math.random() * 69727420);
+	document.cookie = `id=${id}`;
+}
+else
+{
+	id = parseInt(document.cookie.split('=')[1]);
+}
+
+console.log(id);
+
 async function fetchAlbums() {
 	const response = await fetch('http://localhost:3000/songs');
 	songs = await response.json();
@@ -35,7 +48,7 @@ function loadSong(index) {
 	if (index >= 0 && index < songs.length)
 	{
 		currentIndex = index;
-		audioPlayer.src = `http://localhost:3000/stream/${encodeURIComponent(songs[index].id)}`;
+		audioPlayer.src = `http://localhost:3000/stream/${id}/${encodeURIComponent(songs[index].id)}`;
 		audioPlayer.play();
 		updatePlaylistUI();
 	}

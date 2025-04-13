@@ -7,6 +7,16 @@ function getRandomInt(max) {
 	return Math.floor(Math.random() * max) % max;
 }
 
+function shuffleList(n: number): number[] {
+    const list = Array.from({ length: n }, (_, i) => i);
+    for (let i = list.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+}
+
+
 const db = new Database("data.db");
 
 //db.run("CREATE TABLE IF NOT EXISTS paylists (id INTEGER PRIMARY KEY, name TEXT NOT NULL, path TEXT NOT NULL, list TEXT NOT NULL);");
@@ -16,7 +26,11 @@ const app = express();
 
 const audioFolder = path.join(__dirname, '../data');
 
-var dict = {};
+function refreshDb() {
+	//db.run("INSERT INTO playlists (name, path, list) VALUES ('Sonic', '/assets/covers/sonic_robo_blast2.jpg', '');");
+}
+
+var queue = {};
 
 
 app.get('/songs', (req: Request, res: Response) => {
@@ -30,7 +44,7 @@ app.get('/songs', (req: Request, res: Response) => {
 	res.json(albums);
 });
 
-app.get('/stream/:song', (req: Request, res: Response) => {
+app.get('/stream/:user/:song', (req: Request, res: Response) => {
 	//const song = req.params.song;
 	//const filePath = path.join(audioFolder, song);
 	let albumId = req.params.song;
@@ -39,8 +53,18 @@ app.get('/stream/:song', (req: Request, res: Response) => {
 	/*const songs = fs.readdirSync(path.join(audioFolder, album)).sort().filter(file => {
 		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
 	});*/
-	const rand = getRandomInt(songs.length);
+
+	let userId = req.params.user;
+	//const rand = getRandomInt(songs.length);
+	let rand;
+	if (!queue[userId] || queue[userId][0] != albumId || queue[userId][1] == [])
+	{
+		queue[userId] = [albumId, shuffleList(songs.length).join(';')];
+	}
+	rand = parseInt(queue[userId][1].split(';')[0]);
+	queue[userId] = [albumId, queue[userId][1].split(';').slice(1).join(';')];
 	console.log(rand);
+
 	const song = songs[rand];
 	const filePath = path.join(audioFolder, song);
 
