@@ -6,10 +6,11 @@
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.7.2"
   },
   "dependencies": {
-    "better-sqlite3": "^11.8.1",
-    "express": "^4.21.2"
+    "better-sqlite3": "^11.9.1",
+    "express": "^4.21.2",
+    "multer": "^1.4.5-lts.2"
   }
 }

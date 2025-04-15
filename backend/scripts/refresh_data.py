@@ -17,6 +17,8 @@ print(dirs)
 cmd = "INSERT INTO playlists (name, path, list) VALUES "
 
 for dir in dirs:
+    if (input("wanna add " + dir + "? y/n: ") == "n"):
+        continue
     name = dir
     dir = os.path.join("data", dir)
     cmd += "('" + input(dir + " name: ") + "', '" + input(dir + " path: ") + "', '" + ";".join([(name + "/" + f).replace("'", "''") for f in os.listdir(dir) if os.path.isfile(os.path.join(dir, f))]) + "'),"
@@ -27,4 +29,3 @@ print(cmd)
 
 cursor.execute(cmd)
 db.commit()
-

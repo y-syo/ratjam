@@ -1,7 +1,8 @@
 import express, { Request, Response } from 'express';
+import { Database } from "bun:sqlite";
+import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { Database } from "bun:sqlite";
 
 function getRandomInt(max) {
 	return Math.floor(Math.random() * max) % max;
@@ -24,38 +25,45 @@ const db = new Database("data.db");
 
 const app = express();
 
+const storage = multer.diskStorage({
+	destination: '../frontend/assets/covers/',
+	filename: (req, file, cb) => {
+		cb(null, file.originalname);
+	}
+});
+const upload = multer({ storage });
+
 const audioFolder = path.join(__dirname, '../data');
 
-function refreshDb() {
+/*function refreshDb() {
 	//db.run("INSERT INTO playlists (name, path, list) VALUES ('Sonic', '/assets/covers/sonic_robo_blast2.jpg', '');");
-}
+}*/
 
 var queue = {};
+
+
+app.get('/dirlist', (req: Request, res: Response) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Header' , 'authorization');
+	const albums = fs.readdirSync(audioFolder).sort();
+	res.json(albums);
+});
 
 
 app.get('/songs', (req: Request, res: Response) => {
 	res.header('Access-Control-Allow-Origin', '*');
 	res.header('Access-Control-Allow-Header' , 'authorization');
-	/*const songs = fs.readdirSync(audioFolder).filter(file => {
-		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
-	});*/
-	//const albums = fs.readdirSync(audioFolder).sort();
 	const albums = db.query("SELECT * FROM playlists").all()
 	res.json(albums);
 });
 
+
 app.get('/stream/:user/:song', (req: Request, res: Response) => {
-	//const song = req.params.song;
-	//const filePath = path.join(audioFolder, song);
 	let albumId = req.params.song;
 	const result = db.query("SELECT list FROM playlists WHERE id = ?1").all(albumId);
 	const songs = result[0].list.split(';');
-	/*const songs = fs.readdirSync(path.join(audioFolder, album)).sort().filter(file => {
-		return [".mp3", ".ogg", ".wav"].includes(path.extname(file).toLowerCase());
-	});*/
 
 	let userId = req.params.user;
-	//const rand = getRandomInt(songs.length);
 	let rand;
 	if (!queue[userId] || queue[userId][0] != albumId || queue[userId][1] == [])
 	{
@@ -124,6 +132,35 @@ app.get('/stream/:user/:song', (req: Request, res: Response) => {
 		readStream.pipe(res);
     }
 });
+
+
+app.post('/upload', upload.any(), (req, res) => {
+	res.header('Access-Control-Allow-Origin', '*');
+	res.header('Access-Control-Allow-Header' , 'authorization');
+
+	const pass = req.body.password;
+	const metadata: Record<string, any> = {};
+	const covers: Record<string, Express.Multer.File> = {};
+
+	for (const key in req.body)
+	{
+		if (key != "password")
+		{
+			metadata[key] = JSON.parse(req.body[key]);
+		}
+	}
+
+	req.files?.forEach(file => {
+		const baseKey = file.fieldname.replace("-cover", "");
+		covers[baseKey] = file;
+	});
+
+	console.log("password: ", pass);
+	console.log("metadata: ", metadata);
+	console.log("files: ", covers);
+	res.json({status: "ok"});
+});
+
 
 const port = 3000;
 app.listen(port, () => {

@@ -1,3 +1,7 @@
+.hidden {
+	display: none;
+}
+
 body {
 	background: rgb(40,39,60);
 	background: linear-gradient(52deg, rgba(40,39,60,1) 0%, rgba(59,59,75,1) 100%);
@@ -33,4 +37,27 @@ audio {
 	height: 16em;
 	width: 16em;
 	opacity: 100%;
+}
+
+.popup {
+	position: fixed; /* So it stays in place */
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%); /* Center it */
+	background-color: SlateGrey; 
+	padding: 20px;
+	border-radius: 8px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow for depth */
+	z-index: 9999; /* Make sure it shows above other content */
+}
+
+/* Dark background overlay */
+.popup-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.75); /* Transparent black background */
+	z-index: 9998; /* Just below the popup */
 }
