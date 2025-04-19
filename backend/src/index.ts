@@ -158,6 +158,27 @@ app.post('/upload', upload.any(), (req, res) => {
 	console.log("password: ", pass);
 	console.log("metadata: ", metadata);
 	console.log("files: ", covers);
+
+	const dbInsert = db.prepare("INSERT INTO playlists (name, path, list) VALUES (?, ?, ?)");
+
+	Object.keys(metadata).forEach(id => {
+		let fileList = [];
+		fs.readdir(path.join(audioFolder, id), (err, files) => {
+			if (err) {
+				console.error('Error reading directory:', err);
+				return;
+			}
+
+			files.forEach(file => {
+				fileList.push(path.join(id, file));
+			});
+
+			console.log(fileList);
+			dbInsert.run(metadata[id].name, covers[id].filename, fileList.join(';'));
+			//db.run("INSERT INTO playlists (name, path, list) VALUES ('" + metadata[id].name + "', '" + covers[id].filename + "', '" + fileList.join(';') + "');");
+		});
+	});
+
 	res.json({status: "ok"});
 });
 
